@@ -70,6 +70,14 @@ func main() {
 		if update.Message == nil {
 			continue
 		}
+
+		// perhaps save the message to DB too
+		writeStatus := db_helper.AddMessage(update.Message)
+		if writeStatus {
+			log.Println("Message Written successfullly!")
+		} else {
+			log.Println("Message Writing failed!")
+		}
 		if update.Message.IsCommand() { // ignore any non-Message updates
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 			switch TeleBotState {

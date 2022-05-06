@@ -6,6 +6,7 @@ import (
 	"multasko_reborn/models"
 	"multasko_reborn/my_utils"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
@@ -14,7 +15,7 @@ import (
 // }
 var sessionArray []*r.Session
 var url = ""
-var tables [3]string = [...]string{"resources", "toDos", "notes"}
+var tables [4]string = [...]string{"resources", "toDos", "notes", "messages"}
 
 func InitDb() {
 	url = my_utils.GoDotEnvVariable("RETHINK_URL")
@@ -62,7 +63,15 @@ func ListAllTables() {
 	fmt.Println(response)
 }
 
-func AddMessage() bool {
+func AddMessage(msg *tgbotapi.Message) bool {
+
+	session := sessionArray[0]
+	cursor, err := r.Table(tables[3]).Insert(msg).Run(session)
+	if err != nil {
+		log.Printf("error: %s", err)
+		return false
+	}
+	defer cursor.Close()
 	return true
 }
 
